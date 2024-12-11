@@ -75,6 +75,8 @@ PureTimer
 
 # Start
 
+> ❗Local에서 실행 전 `pip install -r requirements.txt`, `npm install` 을 진행해 주세요.
+
 `PureTimer`는 YOLOv11로 커스텀 학습한 모델을 사용해 실시간 카메라 분석으로 사용자의 핸드폰 사용 여부를 판단하고, 이를 통해 학습 타이머를 자동 제어하는 React 기반 웹 플랫폼입니다.
 
 ## 1️⃣ 루트 페이지:
