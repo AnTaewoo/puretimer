@@ -1,26 +1,11 @@
-PureTimer
-=========
+<img src="banner.png" alt="alt text" style="width:100%;">
+
+---
 
 >PureTimer [페이지 바로가기](https://puretimer-front.vercel.app)
 
 학습 집중도를 향상시키기 위한 AI 기반 실시간 학습 타이머 웹 플랫폼입니다.  
 **YOLOv11** 기반 커스텀 모델 을 활용하여, 카메라를 통해 사용자의 핸드폰 사용 여부를 실시간으로 감지하고, 핸드폰 사용 시 자동으로 타이머를 정지합니다.
-
-![alt text](image.png)
-
-[![radix-ui](https://img.shields.io/badge/%40radix--ui-1.1.0-black)](https://example.com)
-[![axios ^1.7.9](https://img.shields.io/badge/axios-1.7.9-blue)](https://example.com)
-[![crypto-js ^4.2.0](https://img.shields.io/badge/crypto--js-4.2.0-yellow)](https://example.com)
-[![react ^18.2.0](https://img.shields.io/badge/react-18.2.0-blue)](https://example.com)
-[![react-google-charts ^5.2.1](https://img.shields.io/badge/react--google--charts-5.2.1-purple)](https://example.com)
-[![react-hook-form ^7.53.2](https://img.shields.io/badge/react--hook--form-7.53.2-red)](https://example.com)
-[![tailwindcss ^3.4.14](https://img.shields.io/badge/tailwindcss-3.4.14-skyblue)](https://example.com)
-[![typescript 5.2.2](https://img.shields.io/badge/typescript-5.2.2-green)](https://example.com)
-[![vite 5.0.8](https://img.shields.io/badge/vite-5.0.8-blue)](https://example.com)
-
-<br />
-
-# Table of Contents
 
 1. [PureTimer](#puretimer)
 2. [INTRODUCTION](#introduction)
@@ -58,6 +43,20 @@ PureTimer
    - [DEV](#dev)
    - [DESIGN](#design)
    - [USED](#used)
+
+<br />
+
+![alt text](image.png)
+
+[![radix-ui](https://img.shields.io/badge/%40radix--ui-1.1.0-black)](https://example.com)
+[![axios ^1.7.9](https://img.shields.io/badge/axios-1.7.9-blue)](https://example.com)
+[![crypto-js ^4.2.0](https://img.shields.io/badge/crypto--js-4.2.0-yellow)](https://example.com)
+[![react ^18.2.0](https://img.shields.io/badge/react-18.2.0-blue)](https://example.com)
+[![react-google-charts ^5.2.1](https://img.shields.io/badge/react--google--charts-5.2.1-purple)](https://example.com)
+[![react-hook-form ^7.53.2](https://img.shields.io/badge/react--hook--form-7.53.2-red)](https://example.com)
+[![tailwindcss ^3.4.14](https://img.shields.io/badge/tailwindcss-3.4.14-skyblue)](https://example.com)
+[![typescript 5.2.2](https://img.shields.io/badge/typescript-5.2.2-green)](https://example.com)
+[![vite 5.0.8](https://img.shields.io/badge/vite-5.0.8-blue)](https://example.com)
 
 <br />
 
