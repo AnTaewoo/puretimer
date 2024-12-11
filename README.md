@@ -18,6 +18,49 @@ PureTimer
 [![typescript 5.2.2](https://img.shields.io/badge/typescript-5.2.2-green)](https://example.com)
 [![vite 5.0.8](https://img.shields.io/badge/vite-5.0.8-blue)](https://example.com)
 
+<br />
+
+# Table of Contents
+
+1. [PureTimer](#puretimer)
+2. [INTRODUCTION](#introduction)
+3. [Start](#start)
+   - [1️⃣ 루트 페이지](#1️⃣-루트-페이지)
+     - [1️⃣-1️⃣ Main 페이지](#1️⃣-1️⃣-main-페이지)
+     - [1️⃣-2️⃣ Overview 페이지](#1️⃣-2️⃣-overview-페이지)
+     - [1️⃣-3️⃣ About 페이지](#1️⃣-3️⃣-about-페이지)
+   - [2️⃣ Auth](#2️⃣-auth)
+     - [2️⃣-1️⃣ Login 페이지](#2️⃣-1️⃣-login-페이지)
+     - [2️⃣-2️⃣ Create User (회원가입 페이지)](#2️⃣-2️⃣-create-user-회원가입-페이지)
+   - [3️⃣ Dashboard](#3️⃣-dashboard)
+     - [3️⃣-1️⃣ Home 페이지](#3️⃣-1️⃣-home-페이지)
+     - [3️⃣-2️⃣ Study 페이지](#3️⃣-2️⃣-study-페이지)
+       - [3️⃣-2️⃣-1️⃣ 기본 공부 상태](#3️⃣-2️⃣-1️⃣-기본-공부-상태)
+       - [3️⃣-2️⃣-2️⃣ 일시정지 상태 (사용자 수동 Pause)](#3️⃣-2️⃣-2️⃣-일시정지-상태-사용자-수동-pause)
+       - [3️⃣-2️⃣-3️⃣ 핸드폰 감지 상태 (자동 Pause)](#3️⃣-2️⃣-3️⃣-핸드폰-감지-상태-자동-pause)
+       - [3️⃣-2️⃣-4️⃣ 종료 상태 (Stop)](#3️⃣-2️⃣-4️⃣-종료-상태-stop)
+   - [4️⃣ 마이페이지](#4️⃣-마이페이지)
+   - [5️⃣ Setting 페이지](#5️⃣-setting-페이지)
+     - [5️⃣-1️⃣ 비밀번호 변경](#5️⃣-1️⃣-비밀번호-변경)
+     - [5️⃣-2️⃣ 회원 탈퇴](#5️⃣-2️⃣-회원-탈퇴)
+4. [MODEL](#MODEL)
+   - [모델 선택 과정](#모델-선택-과정)
+   - [커스텀 데이터셋](#커스텀-데이터셋)
+5. [LICENSE](#LICENSE)
+6. [ARCHITECTURE](#ARCHITECTURE)
+   - [프론트엔드 구조 (puretimer-front/)](#프론트엔드-구조-puretimer-front)
+   - [백엔드 구조 (puretimer-back/)](#백엔드-구조-puretimer-back)
+   - [성능 개선 요소 (프론트엔드)](#성능-개선-요소-프론트엔드)
+   - [성능 개선 요소 (백엔드)](#성능-개선-요소-백엔드)
+7. [개선 요소](#개선-요소)
+8. [Git Repository 목록](#git-repository-목록)
+9. [REFERENCES](#REFERENCES)
+   - [DEV](#dev)
+   - [DESIGN](#design)
+   - [USED](#used)
+
+<br />
+
 # INTRODUCTION
 
 > 📚 PureTimer는 YOLOv11n 모델로 커스텀 학습한 `best.pt` 가중치를 통해 카메라로 사용자의 핸드폰 사용을 실시간 분석하는 웹 플랫폼입니다.
@@ -156,7 +199,7 @@ PureTimer
    - 🔄 **MySQL Cascade 활용**: 데이터베이스 관계 설정을 통해 유저 계정 삭제와 동시에 연관된 스터디 세션 기록이 자동으로 제거됩니다.
   
 
-# Model
+# MODEL
 
 `PureTimer` 프로젝트에서는 실시간 핸드폰 감지를 위해 YOLOv11 기반 모델을 선택하였습니다.  
 기존에는 YOLOv3 → YOLOv5로 전환하여 속도를 개선하려 했지만, 여전히 실시간 감지 환경에서 API 통신 문제를 야기할 정도로 충분히 빠르지 않았습니다. 이에 따라 더 개선된 YOLOv11n 모델을 활용하였습니다.
@@ -192,7 +235,7 @@ PureTimer
 
 <br />
 
-# License
+# LICENSE
 
 AI-architect is released under the MIT License, which means you can freely use, modify, distribute, and even use the code commercially. The only requirement is to include the original copyright notice and license text.
 
@@ -211,7 +254,7 @@ This license was chosen to:
 
 <br />
 
-# 아키텍처
+# ARCHITECTURE
 
 위 구조는 `PureTimer` 프로젝트에서 프론트엔드(React+TypeScript)와 백엔드(Flask)로 나누어진 디렉토리 및 파일 배치를 나타냅니다. 이를 통해 각 부분별 역할이 명확히 분리되고, 유지보수 및 확장성이 향상됩니다.
 
@@ -353,7 +396,7 @@ puretimer-back/
 <br />
 
 
-# References
+# REFERENCES
 
 ### DEV
 - [Typescript](https://www.typescriptlang.org/)
