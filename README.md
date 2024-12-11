@@ -1,513 +1,375 @@
-<!-- # Scaffold-ETH 2로 온체인 SVG 기반 다이나믹 NFT 만들기
+PureTimer
+=========
 
-## 🚩 Step 0. 다이나믹 NFT (feat. 온체인 메타데이터)
+>PureTimer [페이지 바로가기](https://puretimer-front.vercel.app)
 
-NFT를 생성할 때, 메타데이터를 중앙화된 객체 저장소나 IPFS와 같은 탈중앙화 저장소에 저장하는 것이 좋은 방법이다. 이는 이미지나 JSON 객체와 같은 대용량 데이터를 온체인에 직접 저장할 때 발생하는 막대한 가스 비용을 피하기 위함이다다.
+학습 집중도를 향상시키기 위한 AI 기반 실시간 학습 타이머 웹 플랫폼입니다.  
+**YOLOv11** 기반 커스텀 모델 을 활용하여, 카메라를 통해 사용자의 핸드폰 사용 여부를 실시간으로 감지하고, 핸드폰 사용 시 자동으로 타이머를 정지합니다.
 
-하지만 여기에는 문제가 있는데,
+![alt text](image.png)
 
-메타데이터를 블록체인에 저장하지 않으면 스마트 계약에서 해당 메타데이터와 상호작용하는 것이 불가능하다는 것이다. 블록체인은 "외부 세계"와 통신할 수 없기 때문이다.
+[![radix-ui](https://img.shields.io/badge/%40radix--ui-1.1.0-black)](https://example.com)
+[![axios ^1.7.9](https://img.shields.io/badge/axios-1.7.9-blue)](https://example.com)
+[![crypto-js ^4.2.0](https://img.shields.io/badge/crypto--js-4.2.0-yellow)](https://example.com)
+[![react ^18.2.0](https://img.shields.io/badge/react-18.2.0-blue)](https://example.com)
+[![react-google-charts ^5.2.1](https://img.shields.io/badge/react--google--charts-5.2.1-purple)](https://example.com)
+[![react-hook-form ^7.53.2](https://img.shields.io/badge/react--hook--form-7.53.2-red)](https://example.com)
+[![tailwindcss ^3.4.14](https://img.shields.io/badge/tailwindcss-3.4.14-skyblue)](https://example.com)
+[![typescript 5.2.2](https://img.shields.io/badge/typescript-5.2.2-green)](https://example.com)
+[![vite 5.0.8](https://img.shields.io/badge/vite-5.0.8-blue)](https://example.com)
 
-메타데이터를 스마트 계약에서 직접 업데이트하려면 온체인에 저장해야 하지만, 매번 발생하는 가스 비용은 어떻게 해야할?
+# INTRODUCTION
 
-다행히도, Polygon과 같은 L2 체인들이 가스 비용을 대폭 줄여주는 여러 가지 장점을 제공하여 개발자들이 애플리케이션의 기능을 확장할 수 있도록 도와주고있다.
+> 📚 PureTimer는 YOLOv11n 모델로 커스텀 학습한 `best.pt` 가중치를 통해 카메라로 사용자의 핸드폰 사용을 실시간 분석하는 웹 플랫폼입니다.
 
-**⏩️ L2 (Layer2)란?** <br/>
-L2는 기존 블록체인 위에 구축된 2차 프레임워크 또는 프로토콜을 의미한다. 이러한 프로토콜의 주요 목표는 주요 암호화폐 네트워크가 직면하고 있는 거래 속도와 확장성 문제를 해결하는 것이다.
+> 🤳 사용자가 핸드폰을 사용할 경우 타이머를 자동으로 멈추어 집중 학습을 지원하며, 학습 과목과 시간, 낭비 시간(핸드폰 사용으로 인한) 등의 데이터를 관리할 수 있습니다.  
 
-> 🔥 이번 미션에서는 블록체인과의 상호작용에 따라 메타데이터가 변경되는 완전 동적 NFT를 온체인 메타데이터와 함께 만드는 방법을 배우고, 가스 비용을 낮추기 위해 이를 Polygon Amoy에 배포하는 방법을 배운다.
+> 🚀 또한 다른 사용자와 학습 데이터를 공유하거나, 다양한 그래프를 통해 자신의 학습 지표를 확인하고, 비밀번호 변경, 회원 탈퇴, 로그아웃 등 편의 기능도 제공합니다.  
 
----
-
-## 🚩 Step 1. 환경
-
-프로젝트 클론해가기
-
-```sh
-git clone https://github.com/scaffold-eth/scaffold-eth-2.git dynamic-nft
-cd dynamic-nft
-yarn install
-```
-
-<br/>
-
-**🪪 배포자 (Deployer) 설정**
-
-`packages/hardhat/.env` 및 `packages/nextjs/.env.local`을 수정한다.
-
-```bash
-# .env
-ALCHEMY_API_KEY=
-DEPLOYER_PRIVATE_KEY=
-POLYGONSCAN_API_KEY=
-```
-본인 계정의 [Alchemy](https://dashboard.alchemy.com/apps) Apps API key와 소유하고 있는 지갑의 프라이빗 키, [Polygonscan](https://polygonscan.com/apis) API Key를 기입한다.
-
-> Metamask 지갑의 경우, 계정 세부 정보로 들어가면 프라이빗 키를 얻을 수 있다.
-
-<br/>
-
-**🪝 컨트랙트 배포하기**
-
-`packages/hardhat/hardhat.config.ts`에서 defaultNetwork를 `polygonAmoy`로 변경한다.
-
-```sh
-yarn deploy
-```
-
-> ⚠️ Polygon Amoy 네트워크의 MATIC을 가지고 있지 않다면, `🚩 Step 3`를 먼저 선행한다.
-
-<br/>
-
-**🏛️ 프론트엔드 배포하기**
-
-`packages/nextjs/scaffold.config.ts`를 아래처럼 변경한다.
-
-```typescript
-const scaffoldConfig = {
-  targetNetworks: [chains.polygonAmoy],
-
-  // ...
-
-  onlyLocalBurnerWallet: false,
-} as const satisfies ScaffoldConfig;
-```
-
-NestJS 애플리케이션을 배포한다. [Vercel](https://vercel.com/) 에서 로그인 후 dashboard로 이동해 `Add New -> Project` 를 클릭한 후 GitHub repository를 임포트해온다.
-
-```shell
-yarn vercel
-```
-
-📱 Vercel이 제공하는 url 로 접속해서 애플리케이션 열기
-
----
-
-## 🚩 Step 2. Polygon PoS - 더 낮은 가스 비용과 더 빠른 거래
-
-Polygon은 탈중앙화된 EVM 호환 스케일링 플랫폼으로, 개발자가 보안성을 유지하면서 저렴한 거래 수수료로 확장 가능한 사용자 친화적인 DApp을 구축할 수 있도록 한다.
-
-Polygon은 Layer2 체인(L2)으로 설명되는 체인 그룹에 속하며, 이는 Ethereum 위에 구축되어 그 특성을 해결하는 동시에 Ethereum에 의존하여 기능하는 것을 의미한다.
-
-Ethereum은 속도와 비용적인 면에서 효율적이지 않기 때문에, 이때 Polygon이나 Optimism과 같은 L2 솔루션이 중요한 역할을 한다.
-
-예를 들어, Polygon은 다음과 같은 두 가지 주요 장점이 있다.
-
-1. 더 빠른 거래 속도 (초당 65,000건 거래)
-2. Ethereum보다 약 10,000배 낮은 거래당 가스 비용
-
-이 두 번째 이유 때문에 우리는 온체인 메타데이터를 포함한 NFT 스마트 계약을 Polygon에 배포한다. Ethereum에 메타데이터를 저장할 때는 거래당 수백 달러의 비용이 들 수 있지만, Polygon에서는 몇 센트밖에 들지 않는 것이다.
-
-> 🔍 [L2 체인이 거래 비용을 낮추고 거래 속도를 높이는 방법](https://www.one37pm.com/nft/what-are-layer-2-solutions-and-why-are-they-important)
-
----
-
-## 🚩 Step 3. Metamask 지갑에 Polygon Amoy 추가
-
-1. MetaMask 확장 프로그램 아이콘을 클릭
-2. 좌측 상단의 네트워크 드롭다운 메뉴를 클릭하고 `+ 네트워크 추가` 버튼을 클릭
-3. 네트워크 세부 정보 입력
-
-    **네트워크 이름** <br/>
-    Mumbai <br/>
-    **네트워크 URL** <br/>
-    https://rpc-amoy.polygon.technology <br/>
-    **체인 ID** <br/>
-    80002 <br/>
-    **통화 기호** <br/>
-    MATIC <br/>
-    **블록 탐색기 URL** <br/>
-    https://mumbai.polygonscan.com
-
-혹은 [Chainlist](https://chainlist.org/chain/80002)에 들어가서 원하는 네트워크를 찾아 쉽게 추가할 수 있다.
-
-네트워크가 추가 되었으면 [Polygon faucet](https://faucet.polygon.technology/)에서 테스트 MATIC을 받는다.
-
-<img src='./images/test_faucet.png' width=300px></img>
-
----
-
-## 🚩 Step 4. SVG (scalable vector graphic file)
-
-SVG 파일은 확장 가능한 벡터 그래픽 파일의 약자로, 인터넷에서 2차원 이미지를 렌더링하는 데 사용되는 표준 그래픽 파일 유형이다. 다른 인기 있는 이미지 파일 형식과 달리 SVG 형식은 이미지를 벡터로 저장한다.
-
-> ⏩️ **벡터** <br/>
-수학 공식에 따라 점, 선, 곡선 및 모양으로 구성된 그래픽 유형
-
-SVG 파일은 디지털 정보를 저장하고 전송하는 데 사용되는 마크업 언어인 XML로 작성된. SVG 파일의 XML 코드는 이미지를 구성하는 모든 모양, 색상 및 텍스트를 지정한다.
-
-```xml
-<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMinYMin meet" viewBox="0 0 350 350">
-   <style>.base { fill: white; font-family: serif; font-size: 14px; }</style>
-   <rect width="100%" height="100%" fill="black" />
-   <text x="50%" y="40%" class="base" dominant-baseline="middle" text-anchor="middle">Warrior</text>
-   <text x="50%" y="50%" class="base" dominant-baseline="middle" text-anchor="middle">Levels: getLevels(tokenId)</text>
- </svg>
-```
-
-SVG는 코드를 사용하여 쉽게 수정하고 생성할 수 있으며, Base64 데이터로 쉽게 변환할 수 있는 장점이 있다.
-
-Base64 이미지는 호스팅 제공업체 없이 브라우저에서 표시할 수 있기 때문에 체인 상에 객체 스토리지 없이 이미지를 저장할 수 있게 된다.
-
----
-
-## 🚩 Step 5. 민팅 (Minting)
-
-> ✏️ 'Home' 탭에서 `Title`과 `Color`를 입력한 후 **MINT NFT** 버튼을 클릭한다.
-
-<img src='./images/mint.png' width=300px></img>
-
-입력한 Title과 초기 레벨 0을 메타데이터로 가진 NFT가 생성된 것을 확인할 수 있다.
-
----
-
-## 🚩 Step 5. 메타데이터 업데이트
-
-이번에는 NFT를 훈련시켜 레벨을 올려보자.
-
-우측 하단의 `TRAIN NFT` 버튼을 클릭하면, NFT의 레벨이 올라가는 것을 확인할 수 있다.
-
-<img src='./images/train.png' width=300px></img>
-
-
-**[Mint & Train Sequence]**
-<img src='./images/mint_train_sequence.png' width=400px></img>
-# Puretimer: AI 기반 학습 타이머 플랫폼
-
-`Puretimer`는 학습 집중도를 높이기 위한 **AI 기반 학습 타이머 플랫폼**입니다. 실시간 카메라 분석과 YOLOv11을 사용하여 **핸드폰 사용 여부**를 감지하고, 학습 중 핸드폰 사용 시 타이머가 자동으로 멈춥니다. 사용자는 자신의 학습 데이터를 다른 사용자와 공유하거나, 그래프로 시각화하여 분석할 수 있습니다.
+> 기존 YOLOv3 → YOLOv5를 거쳐 속도 향상과 실시간 분석의 어려움을 해결하기 위해 YOLOv11으로 전환하고, 커스텀 데이터셋으로 학습한 모델을 활용하여 실시간 API 응답 기반 객체 감지를 가능하게 하였습니다.
 
 <br />
 
----
+# Start
 
-## 🚀 주요 기능
+`PureTimer`는 YOLOv11로 커스텀 학습한 모델을 사용해 실시간 카메라 분석으로 사용자의 핸드폰 사용 여부를 판단하고, 이를 통해 학습 타이머를 자동 제어하는 React 기반 웹 플랫폼입니다.
 
-1. **실시간 핸드폰 감지**  
-   - YOLOv11과 커스텀 학습 모델(`best.pt`)을 통해 사용자의 핸드폰 사용 여부를 분석.
-   - 핸드폰 사용 감지 시 학습 타이머가 자동으로 중지.
+## 1️⃣ 루트 페이지:
+  ![작동 예시](./overview.png)
    
-2. **학습 데이터 관리 및 공유**  
-   - 학습한 과목, 실제 학습 시간, 낭비된 시간 등을 기록하고, 시각화된 그래프로 확인 가능.  
-   - 데이터는 `Posts`로 공유 가능하며, 다른 사용자들의 학습 데이터를 열람 가능.
+  루트 페이지에서는 프로젝트의 전반적인 내용과 사용된 기술 스택을 확인할 수 있습니다.  
+  `PureTimer`는 YOLOv11n 기반 핸드폰 감지를 통해 공부에 집중할 수 있도록 지원합니다.
 
-3. **유저 편의성 기능**  
-   - 비밀번호 변경, 로그아웃, 회원 탈퇴 등 제공.
+> 1️⃣-1️⃣ **Main 페이지**:
+   - **start 버튼** 클릭 시:  
+     🔑 로그인 상태라면 대시보드로 이동  
+     🚧 로그인하지 않았다면 로그인 페이지로 리다이렉션
 
-4. **보안 강화**  
-   - 비밀번호는 `CryptoJS`를 사용하여 해시 처리 후 저장.  
-   - SSL 인증서를 통해 데이터 암호화.
+   - **overview 링크** 클릭 시:  
+     🔍 프로젝트 개요 및 주요 기능을 확인할 수 있는 페이지로 이동
 
-<br />
+> 1️⃣-2️⃣ **Overview 페이지**:
+   
+   - 📷 카메라로 들어온 영상에서 핸드폰이 감지되면, 일정 정확도(conf)가 넘을 경우 타이머가 일시정지됩니다. 이로써 학습 시간 중 핸드폰 사용으로 인한 비효율을 제거하고, 온전히 집중한 공부 시간만 측정할 수 있습니다.
 
----
+> 1️⃣-3️⃣ **About 페이지**:
+   - 📦 **컨테이너 클릭 시**: 사용한 기술 스택을 확인 가능  
 
-## 📦 기술 스택
+   - 🤖 **YOLO**: 핸드폰 감지 사용  
 
-### 🖥️ 프론트엔드
-- **프레임워크**: React (TypeScript)
-- **스타일링**: Tailwind CSS, Shadcn
-- **데이터 시각화**: React Google Charts
-- **배포**: Vercel, AWS ec2
-- **데이터 저장**: LocalStorage 활용 (e.g., `isLogin`, `isDetect`)
+   - 👀 **OpenCV**: 실시간 이미지 처리  
 
-### 🔧 백엔드
-- **프레임워크**: Flask
-- **구조**: MVC 아키텍처
-- **데이터베이스**: MySQL
-- **AI 모델**: YOLOv11 (`best.pt`)  
-  - 핸드폰 사용 여부를 1초 단위로 감지하여 API로 전달.  
+   - ⚛️ **React**: 웹 프론트엔드 구성
 
-### 🌐 API
-- HTTP 기반 통신 (`AWS 서버 제약으로 WebSocket 미지원`).  
-- Proxy를 사용해 DNS 이슈 해결.
+## 2️⃣ Auth
+  ![작동 예시](./auth.gif)
 
-<br />
+  이 프로젝트에서는 여러 사용자가 자신의 학습 기록을 게시하고, 다른 사용자들과 학습 현황을 공유할 수 있습니다. 또한 각 사용자의 공부 시간, 과목 등을 다양한 차트로 분석할 수 있으므로, 회원가입과 로그인 과정을 통해 계정 인증이 필요합니다.
 
----
+> 2️⃣-1️⃣ **Login 페이지**:
 
-## 🛠️ 주요 아키텍처 설명
+  - 🔑 **로그인 시나리오**: 이미 가입한 이메일과 비밀번호를 입력하여 로그인할 수 있습니다.  
 
-### 프론트엔드 구조
-![Frontend Architecture](./images/frontend_architecture.png)
+  - ❗ **에러 처리**: 잘못된 정보 입력, 미가입 이메일 등의 상황에 대해 유저에게 명확한 에러 메시지를 제공합니다.  
 
-1. **라우팅**: React Router로 경로 관리.  
-2. **레이아웃**: 경로에 따라 적합한 레이아웃 로드.  
-3. **컴포넌트**: `components` 디렉토리에서 관리.  
-4. **데이터 관리**:  
-   - `hooks`로 공통 로직 재사용.  
-   - `context`를 활용한 전역 상태 관리.  
-   - Type은 `types` 디렉토리에 정의.
+  - 💾 **Current User 저장**: 로그인에 성공하면 현재 사용자 정보가 저장되며, 다음 번에 **Overview** 페이지에서 `start`를 클릭하면 바로 대시보드로 진입할 수 있습니다.
+
+> 2️⃣-2️⃣ **Create User (회원가입 페이지)**:
+  - 📧 **이메일 고유성**: 한 이메일당 하나의 계정만 생성 가능하며, 중복 등록은 불가합니다.
+
+  - 🔒 **보안 강화**: 비밀번호는 8자리 해시값으로 암호화되어 SSL 인증서를 통한 안전한 페이로드 전송을 보장합니다.  
+
+  - 📝 **간단한 절차**: 최소한의 정보 입력으로 회원가입을 완료하고, 이후 로그인 후 학습 현황 공유 및 분석 기능을 이용할 수 있습니다.
+
+## 3️⃣ Dashboard
+
+대시보드에서는 여러 사용자의 공부 현황과 과목 정보를 확인할 수 있으며, **Circle Chart** 등의 그래프를 통해 시각적으로 학습 데이터를 파악할 수 있습니다. 또한, 옆에 위치한 **Aside** 메뉴를 통해 다양한 페이지로 손쉽게 이동할 수 있습니다.
+
+> 3️⃣-1️⃣ **Home 페이지**:
+  ![작동 예시](./dashboard.png)
+
+   - 🏠 **Post 조회**: 자신의 게시글뿐만 아니라 다른 사용자들의 공부 현황(포스트)을 확인할 수 있습니다.
+
+   - 👤 **사용자 정보 표시**: 화면 오른쪽 영역에서 자신의 기본 정보를 간략히 확인할 수 있습니다.
+
+> 3️⃣-2️⃣ **Study 페이지**:
+
+   - 📝 **과목 입력 후 공부 시작**: 빈칸에 학습할 과목을 입력한 뒤 **공부 시작**을 누르면 `PureTimer` 기능이 활성화됩니다.
+
+   - 🎥 **카메라 권한 허용**: 실시간 핸드폰 감지를 위해 카메라 접근 권한이 필요합니다.
+
+   - ❗**공부 활성화 감지**: 공부 도중 Aside를 통해 다른 페이지로 이동 시, 전역 `Context`를 통해 이동이 제재됩니다.
+
+   3️⃣-2️⃣-1️⃣ **기본 공부 상태**:
+  ![작동 예시](./studying.gif)
+
+   - 🔵 **파란색 테두리**: 공부 집중 상태  
+
+   - ⏲️ 공부 타이머가 계속 작동하여 순수한 공부 시간을 기록합니다.
+
+   3️⃣-2️⃣-2️⃣ **일시정지 상태 (사용자 수동 Pause)**:
+  ![작동 예시](./pause.gif)
+
+   - 🟡 **노란색 테두리**: Pause 버튼을 눌러 타이머를 멈춘 상태  
+
+   - 🔄 이때 공부 타이머는 멈추고 **Waste Timer**(낭비 시간 타이머)가 작동을 시작합니다.
+
+   3️⃣-2️⃣-3️⃣ **핸드폰 감지 상태 (자동 Pause)**:
+  ![작동 예시](./detect.gif)
+
+   - 🔴 **빨간색 테두리**: 핸드폰 사용 감지 시, Pause/Resume 관계없이 자동으로 Pause 상태로 전환됩니다.  
+
+   - 📵 핸드폰이 화면에서 사라지기 전까지 재개 버튼이 나타나지 않으며, 핸드폰이 없어지면 다시 Pause 상태로 돌아옵니다.
+   
+   3️⃣-2️⃣-4️⃣ **종료 상태 (Stop)**:
+  ![작동 예시](./stop.gif)
 
 
-<br/>
+   - 🛑 **Stop 버튼**: 공부 세션을 종료합니다.  
 
----
+   - 🧮 이 때, 총 공부 시간과 낭비 시간을 계산하여 **mypage**로 이동하여 기록을 확인할 수 있습니다.
 
-## 백엔드 구조 및 설계
+## 4️⃣ 마이페이지
 
->백엔드는 Flask로 구성되었으며, MVC 패턴을 유지하여 구현되었습니다.
+`My Page`에서는 사용자의 계정 생성일 및 수정일, 과거 학습 기록(과목, 공부 시간, 낭비 시간 등)을 확인할 수 있습니다.  
+📊 다양한 차트를 통해 과거 지표와 비교할 수 있으며, 마우스를 올려놓으면 더 자세한 정보(툴팁)를 확인할 수 있습니다.
 
-### 1. 초기 Config 단계
-- `.env` 파일에서 MySQL 구성 정보를 로드.
-- 실행 시 데이터베이스와 테이블의 존재 여부를 확인하고, 없을 경우 자동으로 생성.
+![작동 예시](./bar.png)
+> BAR 형태의 차트
 
-### 2. 데이터베이스 설계
+![작동 예시](./linear.png)
+> LINEAR 형태의 차트
 
-#### 2.1 `user` 테이블
-- **사용 목적**: 회원 정보를 관리.
-- **주요 컬럼**:
-  - `uuid CHAR(32)`: 32자리 해시코드로 무작위 생성된 고유값.  
-    → 이를 통해 유저 식별 및 관리.  
-  - `email VARCHAR(120) NOT NULL UNIQUE`: 사용자 이메일 (고유값).  
-  - `password VARCHAR(255) NOT NULL`: 비밀번호.  
-    - 보안 이슈 방지를 위해 **CryptoJS**를 사용해 8자리 헥사코드로 암호화된 형태로 저장.  
-  - `created`, `updated DATETIME`: 생성 및 수정 일시.  
+![작동 예시](./tooltip.png)
+> TOOLTIP 형태의 차트
 
-#### 2.2 `studysession` 테이블
-- **사용 목적**: 유저의 학습 데이터를 관리.
-- **주요 컬럼**:
-  - `id INT AUTO_INCREMENT`: 고유 ID로 각 기록을 구분.  
-  - `user_uuid CHAR(32)`: `user` 테이블의 `uuid`를 외래키로 참조.  
-  - `subject VARCHAR(255)`: 학습 과목.  
-  - `start_time`, `end_time DATETIME`: 학습 시작 및 종료 시간.  
-  - `real_time TIME`: 실질적인 학습 시간.  
-    → **트리거**를 사용해 자동으로 계산 및 업데이트.  
-  - **Cascade** 설정:  
-    - 유저 탈퇴 시 해당 유저의 모든 학습 기록도 자동 삭제.  
+## 5️⃣ Setting 페이지
 
-### 3. 보안 설계
+사용자는 셋팅(Setting) 페이지를 통해 계정 정보를 관리할 수 있습니다. 비밀번호 변경 기능과 회원 탈퇴 기능을 제공하여, 유저가 자신의 계정을 안전하고 편리하게 관리할 수 있습니다.
 
-#### 비밀번호 암호화
-- **문제점 해결 사례**: Meta가 GDPR 규정을 위반한 사건을 참고하여, 비밀번호 평문 저장 방지를 구현.  
-- **방법**:
-  - 프론트엔드: `CryptoJS`를 사용해 비밀번호를 암호화 후 전송.
-  - 백엔드: SSL 인증서를 통해 페이로드 데이터를 암호화.
+> 5️⃣-1️⃣ **비밀번호 변경**:
+   - 🔑 **즉시 적용**: 비밀번호를 변경하면 그 즉시 적용되며, 이후 로그인 시 새로운 비밀번호를 사용해야 합니다.
+   - 💂 **보안 강화**: 비밀번호는 8자리 해시값으로 암호화되고, SSL 인증서를 통한 암호화된 페이로드로 전송되어 안전성을 보장합니다.
 
-### 4. MVC 패턴 구조
+> 5️⃣-2️⃣ **회원 탈퇴**:
+   - 💣 **탈퇴 시 데이터 연계 삭제**: 회원 탈퇴를 진행하면 해당 사용자가 작성한 게시물(post)도 함께 삭제됩니다.
+   - 🔄 **MySQL Cascade 활용**: 데이터베이스 관계 설정을 통해 유저 계정 삭제와 동시에 연관된 스터디 세션 기록이 자동으로 제거됩니다.
+  
 
-#### 4.1 View
-- 요청 경로 확인 후, 트리거된 함수를 호출.
-- JSON 데이터를 `param`으로 전달.
-- URL에 직접 데이터를 제공하는 경우도 지원 (`/user/read/<uuid>`).
+# Model
 
-#### 4.2 Controller
-- View와 Model 간의 입출력 데이터를 관리.
-- 다양한 상태에 따른 응답(Response) 및 에러(Error) 처리.
+`PureTimer` 프로젝트에서는 실시간 핸드폰 감지를 위해 YOLOv11 기반 모델을 선택하였습니다.  
+기존에는 YOLOv3 → YOLOv5로 전환하여 속도를 개선하려 했지만, 여전히 실시간 감지 환경에서 API 통신 문제를 야기할 정도로 충분히 빠르지 않았습니다. 이에 따라 더 개선된 YOLOv11n 모델을 활용하였습니다.
 
-#### 4.3 Model
-- **SQL 처리**:  
-  - `config` 단계에서 정의한 `mysql-connector`의 connection을 활용.  
-  - SQL 쿼리를 실행하고, 결과를 반환.  
+## 모델 선택 과정
 
-#### 4.4 DetectModel 클래스
-  **핸드폰 감지 로직**:
-  - **Blob 데이터 처리**:  
-    - API로 전달받은 Blob 이미지를 변환.  
-    - OpenCV 기반의 `opencv_detector_yolov11` 라이브러리의 `detect_phone_yolo` 함수 호출.  
-  - **YOLOv11 모델**:
-    - Custom Dataset으로 학습된 `best.pt` 모델 사용.
-    - 1초마다 분석하여 감지된 객체 중 `confidence > 0.65`인 경우 핸드폰으로 판단.  
-  - **결과**:
-    - `num_phone`: 감지된 핸드폰 수.
-    - `confidences`: 정확도의 배열 -->
+- **YOLOv3 & YOLOv5 비교**:  
+  YOLOv5 모델이 YOLOv3 대비 속도 향상 측면에서 유리했으나, 실시간 감지 + API 통신 환경에서 여전히 문제를 일으킬 수준의 속도 지연이 존재하였습니다.
 
-# PureTimer: AI 기반 학습 타이머 플랫폼
+- **YOLOv11n 도입**:  
+  Ultralytics의 YOLOv11n 모델은 더 나은 성능과 속도를 제공하여, 실시간 핸드폰 감지에 적합한 모델로 선정되었습니다.  
+  아래는 [Ultralytics](https://github.com/ultralytics/ultralytics)에서 제공하는 YOLOv11 모델 성능 지표 예시입니다.
 
-`PureTimer`는 YOLOv11과 커스텀 학습 데이터를 활용하여 사용자의 실시간 핸드폰 사용 여부를 감지하고, 이를 통해 학습 집중도를 향상시키는 웹 플랫폼입니다. 사용자가 카메라를 통해 학습 상황을 관찰하면, 핸드폰 사용 시 타이머가 자동으로 멈추며, 그 외에도 다양한 학습 데이터를 관리·공유할 수 있습니다.
+| Model    | size (px) | mAP<sup>val</sup> 50-95 | Speed CPU ONNX (ms)  | Speed T4 TensorRT10 (ms) | params (M) | FLOPs (B) |
+|----------|------------|-------------------------|----------------------|--------------------------|------------|-----------|
+| YOLO11n  | 640        | 39.5                    | 56.1 ± 0.8           | 1.5 ± 0.0               | 2.6        | 6.5       |
+| YOLO11s  | 640        | 47.0                    | 90.0 ± 1.2           | 2.5 ± 0.0               | 9.4        | 21.5      |
+| YOLO11m  | 640        | 51.5                    | 183.2 ± 2.0          | 4.7 ± 0.1               | 20.1       | 68.0      |
+| YOLO11l  | 640        | 53.4                    | 238.6 ± 1.4          | 6.2 ± 0.1               | 25.3       | 86.9      |
+| YOLO11x  | 640        | 54.7                    | 462.8 ± 6.7          | 11.3 ± 0.2              | 56.9       | 194.9     |
 
-<br />
+위 지표를 참고하여 가장 경량화된 YOLO11n 모델을 채택하였습니다.
 
----
+## 커스텀 데이터셋
+![학습](./train.png)
 
-## 주요 기능
+핸드폰 감지를 위한 커스텀 데이터셋은 [roboflow](https://universe.roboflow.com/algoconcept/smartphone-images)에서 제공하는 스마트폰 이미지 데이터셋을 사용하였습니다. 해당 데이터셋을 YOLO 포맷으로 변환한 뒤 학습에 활용하였으며, 이를 통해 핸드폰 감지 성능을 극대화하였습니다.
 
-1. **실시간 핸드폰 감지**  
-   - YOLOv11 + 커스텀 데이터셋(`best.pt`) 기반 실시간 핸드폰 사용 여부 감지  
-   - 핸드폰 사용 시 학습 타이머 자동 정지
+일반적인(Google Open Images, COCO 등) 제너럴 학습 데이터세트를 활용하면 다양한 객체를 감지하게 되어 필요 없는 오브젝트까지 탐지하는 상황이 발생할 수 있습니다.  
+이로 인해 모델 성능 및 실시간 처리 효율성이 저하될 수 있으며, PureTimer에서는 **핸드폰 감지**라는 명확한 목표가 존재하므로, 목적에 맞는 **커스텀 데이터셋**을 활용하는 것이 더 효과적이라 판단하였습니다.
 
-2. **학습 데이터 관리 및 공유**  
-   - 학습 과목, 실질적 학습 시간, 낭비된 학습 시간(핸드폰 사용) 데이터 관리  
-   - 다른 사용자와 학습 데이터(포스트) 공유 및 열람  
-   - React Google Charts 기반 그래프 시각화를 통한 데이터 분석
 
-3. **유저 관리 기능**  
-   - 비밀번호 변경, 회원 탈퇴, 로그아웃 등의 계정 관리 기능 지원
-
-4. **보안 강화**  
-   - 비밀번호는 CryptoJS를 활용한 8자리 Hex 암호화 후 저장  
-   - SSL 인증서 적용을 통한 payload 암호화
-
-<br />
-
----
-
-## 기술 스택
-
-### 프론트엔드
-
-- **언어/프레임워크**: TypeScript, React  
-- **라우팅/아키텍처**: 라우터별 Layout, `pages`, `components` 구조화  
-- **스타일링**: Tailwind CSS, Shadcn  
-- **시각화**: React Google Charts  
-- **배포**: Vercel  
-- **상태 관리**: Context, Hooks를 통한 상태 및 로직 관리  
-- **LocalStorage 활용**: `isLogin`, `isDetect` 등을 저장해 특정 상황(새로고침 등)에서도 상태 유지  
-- **Proxy 사용**: DNS 문제로 인한 http API 통신 제한 해결
-
-### 백엔드
-
-- **프레임워크**: Flask (MVC 패턴 유지)  
-- **DB 연동**: MySQL  
-  - **user 테이블**: uuid, email, password 등의 회원정보 관리  
-  - **studysession 테이블**: user_uuid 외래키 연동, subject, start_time, end_time, waste_time, real_time 관리  
-    - real_time은 트리거를 통해 자동 업데이트  
-    - user 삭제 시 CASCADE로 해당 유저의 post도 삭제  
-- **API**: AWS 서버 호스팅, HTTP 기반 통신  
-- **보안**: 비밀번호 해시 + SSL로 payload 암호화
-
-### YOLO 모델
-
-- **YOLOv11**:  
-  - yolov3 → yolov5 → yolov11로 업그레이드  
-  - 커스텀 데이터셋을 통한 `best.pt` 모델 활용  
-  - 1초 단위 Blob 이미지 처리 후 핸드폰 감지  
-  - conf ≥ 0.65인 경우 핸드폰으로 판단
 
 <br />
 
----
+# License
 
-## PureTimer 아키텍처 구조
+AI-architect is released under the MIT License, which means you can freely use, modify, distribute, and even use the code commercially. The only requirement is to include the original copyright notice and license text.
 
-`PureTimer`는 프론트엔드와 백엔드를 분리하여 구성하였으며, 각각 명확한 디렉토리 구조를 통해 유지보수성과 확장성을 보장합니다.
+```
+MIT License
+Copyright (c) 2024 Puretimer
+```
 
-### 프론트엔드 구조 (`puretimer-front/`)
+See the [LICENSE.md](LICENSE.md) file for the full license text.
 
-프론트엔드는 **React**와 **TypeScript** 기반으로 구현되었습니다. 각 페이지별 라우팅 및 레이아웃 처리, 공통 컴포넌트와 훅(Hooks) 관리, 컨텍스트를 통한 전역 상태 관리, 타입 정의를 통한 안정적인 개발 환경을 갖추고 있습니다.
+This license was chosen to:
+- Allow maximum freedom for developers and users
+- Enable commercial use of the software
+- Maintain simplicity in licensing terms
+- Promote widespread adoption of the project
 
-```plaintext
+<br />
+
+# 아키텍처
+
+위 구조는 `PureTimer` 프로젝트에서 프론트엔드(React+TypeScript)와 백엔드(Flask)로 나누어진 디렉토리 및 파일 배치를 나타냅니다. 이를 통해 각 부분별 역할이 명확히 분리되고, 유지보수 및 확장성이 향상됩니다.
+
+## 프론트엔드 구조 (puretimer-front/)
+
+프론트엔드는 React와 TypeScript 기반으로, 명확한 디렉토리 구조를 통해 역할을 분리하고 있습니다.
+
+```planeText
 puretimer-front/
 └─ src/
-   ├─ assets/            # 정적 리소스(이미지, 아이콘)
+   ├─ assets/
    │  ├─ auth/
    │  ├─ dashboard/
    │  ├─ footer/
    │  └─ landing/
    │
-   ├─ components/        # 재사용 가능한 UI 컴포넌트 및 페이지 전용 컴포넌트
-   │  ├─ dashboard/      # 대시보드 관련 컴포넌트
+   ├─ components/
+   │  ├─ dashboard/
    │  │  ├─ _components/
    │  │  ├─ index.ts
    │  │  ├─ Main.tsx
    │  │  └─ Profile.tsx
-   │  ├─ landing/        # 랜딩 페이지 관련 컴포넌트
-   │  │  ├─ _container/
-   │  │  ├─ About.tsx
-   │  │  ├─ index.ts
-   │  │  ├─ Main.tsx
-   │  │  └─ Overview.tsx
-   │  ├─ mypage/         # 마이페이지 관련 컴포넌트
-   │  │  ├─ _componentns/
-   │  │  ├─ Analysis.tsx
-   │  │  ├─ index.ts
-   │  │  └─ Profile.tsx
-   │  ├─ setting/        # 환경설정 관련(비밀번호 변경, 계정 삭제 등)
-   │  │  ├─ DeleteAccount.tsx
-   │  │  └─ SettingForm.tsx
-   │  ├─ signin/         # 로그인 관련 컴포넌트
-   │  │  ├─ index.ts
-   │  │  ├─ SigninForm.tsx
-   │  │  └─ SigninTitle.tsx
-   │  ├─ signup/         # 회원가입 관련 컴포넌트
-   │  │  ├─ index.ts
-   │  │  ├─ SignupForm.tsx
-   │  │  └─ SignupTitle.tsx
-   │  ├─ study/          # 학습(감지) 관련 컴포넌트
-   │  │  ├─ DetectForm.tsx
-   │  │  └─ StudyForm.tsx
-   │  └─ ui/             # 공용 UI 컴포넌트(aside, auth, chart, footer, header, shadcn 등)
+   │  ├─ landing/
+   │  ├─ mypage/
+   │  ├─ setting/
+   │  ├─ signin/
+   │  ├─ signup/
+   │  ├─ study/
+   │  └─ ui/
    │     ├─ aside/
    │     ├─ auth/
    │     ├─ chart/
    │     ├─ footer/
    │     ├─ header/
-   │     ├─ shadcn/      # shadcn UI 커스텀 컴포넌트
-   │     │  ├─ button.tsx
-   │     │  ├─ card.tsx
-   │     │  ├─ chart.tsx
-   │     │  ├─ input.tsx
-   │     │  ├─ select.tsx
-   │     │  └─ sonner.tsx
+   │     ├─ shadcn/
    │     └─ title/
    │
-   ├─ hooks/             # 공용 로직 훅 (ex: useAlert, useCryptoValue, useDate, useFetchApi, useLocalStorage)
-   │  ├─ useAlert.tsx
-   │  ├─ useCryptoValue.tsx
-   │  ├─ useDate.tsx
-   │  ├─ useFetchApi.tsx
-   │  └─ useLocalStorage.tsx
-   │
-   ├─ layouts/           # 라우팅별 레이아웃 (AuthLayout, DashBoardLayout, LandingLayout)
-   │  ├─ AuthLayout.tsx
-   │  ├─ DashBoardLayout.tsx
-   │  └─ LandingLayout.tsx
-   │
-   ├─ lib/               # 공용 유틸 함수
-   │  └─ utils.ts
-   │
-   ├─ pages/             # 페이지 컴포넌트 (라우팅 엔트리 포인트)
+   ├─ hooks/
+   ├─ layouts/
+   ├─ lib/
+   ├─ pages/
    │  ├─ dashboard/
-   │  │  └─ DashBoard.tsx
    │  ├─ landing/
-   │  │  └─ Landing.tsx
    │  ├─ mypage/
-   │  │  └─ Mypage.tsx
    │  ├─ setting/
-   │  │  └─ Setting.tsx
    │  ├─ signin/
-   │  │  └─ Signin.tsx
    │  ├─ signup/
-   │  │  └─ Signup.tsx
    │  └─ study/
-   │     ├─ Detect.tsx
-   │     └─ Study.tsx
    │
-   ├─ provider/context/  # 전역 상태 관리(Context API)
-   │  ├─ ContextProvider.tsx
-   │  ├─ DetectContext.tsx
-   │  ├─ index.ts
-   │  ├─ LandingContext.tsx
-   │  └─ UserContext.tsx
-   │
-   ├─ router/            # 라우터 설정
-   │  └─ Router.tsx
-   │
-   ├─ types/             # 타입 정의
-   │
-   ├─ index.css          # 전역 스타일
-   └─ main.tsx           # 앱 엔트리 포인트
-   ```
-### 백엔드 구조 (puretimer-back/)
+   ├─ provider/
+   │  └─ context/
+   ├─ router/
+   ├─ types/
+   ├─ index.css
+   └─ main.tsx
+```
 
-백엔드는 **Flask** 기반의 **MVC 패턴**으로 구현되었습니다. View를 통한 라우팅 및 JSON 응답 처리, Controller를 통한 요청/응답 로직 및 예외 처리, Model을 통한 DB 연동과 YOLO 감지 로직 호출을 통해 명확한 관심사 분리와 유지보수성을 확보하였으며, config.py를 통해 DB 접속 정보 및 초기 테이블 생성 로직을 관리하고, opencv_detector_yolov11.py를 활용해 실시간 핸드폰 감지 기능을 구현하였습니다.
+### 성능 개선 요소 (프론트엔드)
 
-```planetext
+1. **Code Splitting & Lazy Loading**:  
+   필요할 때만 특정 페이지나 컴포넌트를 불러와 초기 로딩 속도를 개선할 수 있습니다.
+   
+2. **Memoization & useCallback/useMemo**:  
+   빈번한 재렌더링을 방지하기 위해 props나 state에 따라 재계산이 필요한 부분에 메모화를 적용할 수 있습니다.
+   
+3. **React Query/ SWR 사용 고려**:  
+   API 요청 시 캐싱 및 자동 리프레시 기능을 활용해 네트워크 부하 완화 및 UI 반응성 향상 가능.
+
+4. **정적 파일 최적화**:  
+   이미지, 아이콘 최적화(CDN 활용, WebP 등 사용) 및 CSS, JS 번들 사이즈 최소화.
+
+## 백엔드 구조 (puretimer-back/)
+
+백엔드는 Flask 기반의 MVC 패턴을 유지하고 있습니다.
+
+```planeText
 puretimer-back/
 ├─ controller/
-│  └─ controller.py          # 요청/응답 처리 및 비즈니스 로직 제어
-│
+│  └─ controller.py
 ├─ model/
-│  └─ model.py               # DB 쿼리 및 YOLO 감지 로직 호출
-│
-├─ runs/                     # YOLO 실행 결과, 추가 리소스
-│
+│  └─ model.py
 ├─ view/
-│  └─ view.py                # Flask 라우팅, JSON 응답 반환
-│
-├─ .env                      # 환경 변수 (DB 접속 정보 등)
-├─ .gitignore
-├─ app.py                    # Flask 앱 실행 엔트리 포인트
-├─ best.pt                   # 커스텀 학습된 YOLOv11 모델 가중치
-├─ config.py                 # DB 설정, 초기화 로직
-└─ opencv_detector_yolov11.py # YOLOv11 기반 핸드폰 감지 함수 구현
+│  └─ view.py
+├─ .env
+├─ app.py
+├─ best.pt
+├─ config.py
+└─ opencv_detector_yolov11.py
 ```
+
+### 성능 개선 요소 (백엔드)
+
+1. **비동기 처리/멀티프로세싱**:  
+   이미지 처리 요청을 비동기적으로 처리하거나, 필요 시 Celery 또는 멀티프로세스 환경 도입을 고려하여 요청 처리량 증가에 대비할 수 있습니다.
+   
+2. **캐싱 전략 도입**:  
+   자주 조회되는 데이터(예: 사용자 프로필, 정적 데이터)에 대해 Redis 같은 인메모리 캐시를 활용해 응답 속도를 개선할 수 있습니다.
+   
+3. **DB 인덱싱 & 쿼리 최적화**:  
+   DB 스키마를 최적화하고 인덱스를 적절히 추가하여 쿼리 응답 속도를 향상할 수 있습니다.
+   
+4. **Load Balancing & Scaling**:  
+   트래픽이 증가할 경우 로드 밸런싱 또는 수평적 스케일링을 통해 서버 성능을 개선할 수 있습니다.
+
+---
+
+위와 같은 성능 개선 요소를 바탕으로 전체 시스템의 응답 속도와 안정성을 높이고, 실시간 핸드폰 감지라는 핵심 기능을 더욱 원활하게 제공할 수 있습니다.
+
+<br />
+
+# 개선 요소
+
+1. **WebSocket 통신 제약사항 개선**:  
+   현재는 AWS 서버 한계로 인해 WebSocket 통신 대신 1초 단위의 이미지 처리 방식으로 구현하고 있습니다. 향후에는 실시간 동영상 스트리밍 방식으로 전환하여, 보다 자연스럽고 지연 없는 감지 기능을 구현하고 싶습니다.
+
+2. **이메일 인증 시스템 보완**:  
+   Auth 기능에서 Firebase Authentication의 이메일 인증(Email Verify) 기능을 활용하려 했으나, 개발 기간 상의 이유로 구현하지 못했습니다. 추후 이 기능을 도입하여, 사용자 계정의 신뢰성과 보안을 강화할 계획입니다.
+
+3. **네트워크 및 배포 환경 개선**:  
+   현재 AWS 서버의 DNS 문제로 인해 http 통신에 제약이 있어 프록시 설정을 통한 단기 해결책을 사용하고 있습니다. 향후에는 별도의 DNS를 구매하여 HTTPS 환경을 구축하고, Vercel 대신 Nginx 설정을 통해 한 곳에서 통합 관리하는 방식으로 네트워크 및 배포 환경을 개선할 계획입니다.
+
+<br />
+
+# Git Repository 목록
+
+`PureTimer` 프로젝트는 프론트엔드, 백엔드, AI 모델 관련 코드를 각각 별도의 Git 리포지토리로 관리하고 있습니다.
+
+- **프론트엔드 (React/TypeScript)**  
+  - Git 주소: [https://github.com/AnTaewoo/puretimer-front.git](https://github.com/AnTaewoo/puretimer-front.git)  
+  - **main 브랜치**: 실제 배포에 사용되는 프론트엔드 코드  
+  - **local 브랜치**: 로컬 환경에서 테스트할 수 있는 파일들이 포함되어 있음
+
+- **백엔드 (Flask/MVC 구조)**
+  - Git 주소: [https://github.com/AnTaewoo/puretimer-back.git](https://github.com/AnTaewoo/puretimer-back.git)
+
+- **AI 모델 (YOLOv11 커스텀 모델)**
+  - Git 주소: [https://github.com/AnTaewoo/puretimer-ai.git](https://github.com/AnTaewoo/puretimer-ai.git)
+
+<br />
+
+
+# References
+
+### DEV
+- [Typescript](https://www.typescriptlang.org/)
+- [React](https://react.dev/)
+- [Tailwind css](https://tailwindcss.com/)
+- [Shadcn/ui](https://ui.shadcn.com/)
+- [Vite](https://vite.dev/)
+- [Pytorch](https://pytorch.org/docs/stable/nn.html)
+- [ReactHookForm](https://react-hook-form.com/)
+- [Flask](https://flask.palletsprojects.com/en/stable/)
+
+### DESIGN
+- [Figma - Landing](https://www.figma.com/community/file/1298287435486709856/35-modern-heros-with-gradients-and-mockups)
+- [Instagram - Dashboard](https://www.instagram.com/)
+- [Facebook - auth](https://www.facebook.com/)
+
+### USED
+- [GPT-4](https://openai.com/index/gpt-4/)
+- [Claude](https://claude.ai/)
